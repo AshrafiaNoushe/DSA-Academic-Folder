@@ -1,44 +1,41 @@
-#include<bits/stdc++.h>
+#include <bits/stdc++.h>
 using namespace std;
-bool comp(vector<int>&a,vector<int>&b){
-    double a1 = (1.0*a[0])/a[1];
-    double b1 = (1.0*b[0])/b[1];
-    return a1>b1;
-    /* in item={
-    60, 10 // here it hold a[0],a[1]
-    100,20 // here b[0] b[1]
-    120,30 // sequentially 2ta row compare kore boro ta return debe 0,1 1,2 2,3 row num
-    }*/
+
+struct Item {
+    int weight, value;
+};
+
+bool compare(Item a, Item b) {
+    double r1 = (double)a.value / a.weight;
+    double r2 = (double)b.value / b.weight;
+    return r1 > r2;   // sort by ratio descending
 }
-int frictional_kanpsack(vector<int>&p,vector<int>&w,int capacity){
-    int n = p.size();
-    vector<vector<int>>items(n,vector<int>(2));
-    for(int i= 0; i<n;i++){ 
-        items[i][0]= p[i];
-        items[i][1] =w[i];
-    }
-    sort(items.begin(),items.end(),comp);
-    double res = 0.0;
-    int currCap = capacity;
-    for(int i=0;i<n;i++){
-        if(currCap>= items[i][1]){ // check if we call take whole weight
-            res += items[i][0]; //add profit
-            currCap-=items[i][1];
-        } //if can't then take fractional;
-        else{
-            res+=((1.0 * items[i][0])/items[i][1])*currCap;
+
+double fractionalKnapsack(int W, vector<Item>& items) {
+    sort(items.begin(), items.end(), compare);
+
+    double totalValue = 0.0;
+
+    for (auto &item : items) {
+        if (W == 0) break;
+
+        if (item.weight <= W) {
+            totalValue += item.value;
+            W -= item.weight;
+        }
+        else {
+            // take fraction
+            totalValue += (double)item.value * ((double)W / item.weight);
             break;
         }
     }
-    return res;
-
+    return totalValue;
 }
-int main()
-{
-    vector<int>profit = {60, 100, 120};
-    vector<int> weight = {10, 20, 30};
-    int capacity = 50;
-    int total_profit =frictional_kanpsack(profit,weight,capacity);
-    cout<<total_profit<<endl;
-    return 0;
+
+int main() {
+    vector<Item> items = { {10, 60}, {20, 100}, {30, 120} };
+    int W = 50;
+
+    cout << "Fractional Knapsack Max Value = "
+         << fractionalKnapsack(W, items) << endl;
 }
